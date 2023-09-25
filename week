@@ -1,0 +1,13 @@
+What articles did you read this week? For full credit, you must provide a summary of at least two articles.
+Your Answer:
+1st article: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7876211/Links to an external site.
+
+Summary: This article discusses how Cox proportional methods are used in a study of post-surgical patients with stage 3 lung cancer. The authors calculated the survival estimates using the Kaplan-Meier estimates, which I discuss and reference in a different article. They used log-rank test to compare the survival rates between the two groups (males and females). They discuss the advantages and disadvantages of using log-rank test. Then they discuss the assumptions of the CPH test and how it is advantageous for clinical research. They observed that patients that are the same age, females have a 41% reduced risk of mortality and a 1 unit increase in age increases the risk of mortality by 1%.
+
+2nd article: https://socialsciences.mcmaster.ca/jfox/Books/Companion/appendices/Appendix-Cox-Regression.pdfLinks to an external site.
+
+Summary: The authors use the Rossi data set in the carData package in R. The data explores recidivism rates among males in a prison. They created a Cox regression time of re-arrest. They went into detail about how to read the output of the different coefficients. Then, they showed a graph of the estimated survival prediction. There is a specific package in r called Survival, which is useful for this type of analysis.
+
+Article: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC403858/#:~:text=The%20logrank%20test%20is%20most,medical%20with%20a%20surgical%20intervention.https://www.ncbi.nlm.nih.gov/pmc/articles/PMC403858/#:~:text=The%20logrank%20test%20is%20most,medical%20with%20a%20surgical%20interventionLinks to an external site..
+
+Summary: This article goes into depth on what the log-rank test is that I mentioned above. It is used to compare the survival rates between two groups. The log-rank test gives a comparison at some arbitraty point in the point, instead of comparing the whole survival time to one another. The log-rank test is also based on the same assumptions as the Kaplan test. The log-rank test is also more likely to detect a different in the groups when the risk for the outcome of interest is higher in one of the groups. 
