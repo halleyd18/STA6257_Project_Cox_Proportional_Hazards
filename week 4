@@ -1,0 +1,13 @@
+
+Article 1: 
+https://link.springer.com/article/10.1186/s12891-021-04379-2
+
+Summary: This article tests the strength of proportional hazards in total joint arthroplasty studies. They found a total of 1154 studies by searching for "cox" AND "hazard" in the abstract. The abstract also had to meet the following criteria: the topic must be on 
+knee or hip joint arthroplasty, survival analysis was used, and a hazard ratio was reported. If those criteria were met, the entire article was read. Nearly 80% of the published TJA survival studies reported proportional hazard assumptions of the Cox regression model 
+inadequately. Also, more than one-fifth of the studies were found to include a probable non-proportional Cox model.
+
+Article 2:
+https://www.sciencedirect.com/science/article/pii/S0001457509002619
+
+Summary: This article uses a cox proprtional hazards model to study the relationship between sleepiness and prediction of a driver's impairment. The approach was to only use the parametric part of the hazard function to study changes in risk of a critical event
+(lane change) due to changes in the explanatory variables (indicators). The probability of a critical event is proportional to the hazard function and therefore the changes in risk can be estimated by changes in the hazard function. All co-variates were statistically signifcant. 
