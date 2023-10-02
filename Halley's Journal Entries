@@ -1,0 +1,50 @@
+Week 1:
+
+What articles did you read this week? For full credit, you must provide a summary of at least two articles.
+Your Answer:
+1st article: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7876211/Links to an external site.
+
+Summary: This article discusses how Cox proportional methods are used in a study of post-surgical patients with stage 3 lung cancer. The authors calculated the survival estimates using the Kaplan-Meier estimates, which I discuss and reference in a different article. They used log-rank test to compare the survival rates between the two groups (males and females). They discuss the advantages and disadvantages of using log-rank test. Then they discuss the assumptions of the CPH test and how it is advantageous for clinical research. They observed that patients that are the same age, females have a 41% reduced risk of mortality and a 1 unit increase in age increases the risk of mortality by 1%.
+
+2nd article: https://socialsciences.mcmaster.ca/jfox/Books/Companion/appendices/Appendix-Cox-Regression.pdfLinks to an external site.
+
+Summary: The authors use the Rossi data set in the carData package in R. The data explores recidivism rates among males in a prison. They created a Cox regression time of re-arrest. They went into detail about how to read the output of the different coefficients. Then, they showed a graph of the estimated survival prediction. There is a specific package in r called Survival, which is useful for this type of analysis.
+
+Article: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC403858/#:~:text=The%20logrank%20test%20is%20most,medical%20with%20a%20surgical%20intervention.https://www.ncbi.nlm.nih.gov/pmc/articles/PMC403858/#:~:text=The%20logrank%20test%20is%20most,medical%20with%20a%20surgical%20interventionLinks to an external site..
+
+Summary: This article goes into depth on what the log-rank test is that I mentioned above. It is used to compare the survival rates between two groups. The log-rank test gives a comparison at some arbitraty point in the point, instead of comparing the whole survival time to one another. The log-rank test is also based on the same assumptions as the Kaplan test. The log-rank test is also more likely to detect a different in the groups when the risk for the outcome of interest is higher in one of the groups. 
+
+Week 2:
+
+Article: https://academic.oup.com/jid/article/192/10/1836/877713
+
+Summary: This article uses Cox Proportinal Hazards to analyze the time to reinfection rates of Chlamydia trachomatis based on various factors such as sex, age, and the time of first infection expressed in years. The author explained how 
+relative risk of re-infection was calculated and assessed how it changed over time. 
+
+Article 2: https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/205907
+
+Summary: In this article, the authors use Cox proportinal hazards to examine the relative impact of various factors, such as colonization pressure, compliance with infection control measures, and antibiotic use on the acquisition of Vancomycin-Resistant Enterococcus (VRE)
+in a Medical Intesive Care Unit. This article also includes hazard ratios. 
+
+Week 3:
+Article 1: http://dl.nsf.gov.lk/bitstream/handle/1/6320/Jnsf-37(1)-41.pdf?sequence=2Links to an external site.
+
+Summary: The goal of this study is to see whether hazard ration, relative risk, and other estimates made by the Cox Proportional Hazards model are biased when the basic assumptions of the model are violated. This is very important because whenever regression models are run, not just Cox Proportional Hazards models, many times we take for granted that the assumptions of the model are met. This can lead to incorrect conclusions and predictions. The Cox model assumes that the hazard ratios remain constant over time. If this is violated, then the model may falsely suggest that a variable is significant or vice versa. This study showed an example where the hazards ratio is not constant over time. An example was with the age of smokers and the RR as age increased. As there was an increase in cumulative smoking exposure, the RR decrease after 50. It was also addressed how in the Cox PH model, there is increased emphasis on the Relative Risk. This is convenient because it doesn't require estimating background information. They first examined survival curves by smoking status and then compared a simulated data set could define mortality to a real data set. They found that single minded focus on PH models have hindered the development of other models in epidemiologic data. Sometimes hazard functions, rather than the rate of hazard functions may be a better alternative. 
+
+Article 2: https://bmcmusculoskeletdisord.biomedcentral.com/articles/10.1186/s12891-021-04379-2Links to an external site.
+
+Summary: The goal of this paper is very similar to the first study. It investigates, in detail, the reporting of the model details as well as the model assumptions with total joint arthroplasty studies. Nearly 80% of the Cox proportional hazards were reported inadequately. However, it is still amongst the most used models. One of the solutions was to hire statisticians to review the process and make sure reproducible results are created. 
+
+Week 4: 
+Article 1: 
+https://link.springer.com/article/10.1186/s12891-021-04379-2
+
+Summary: This article tests the strength of proportional hazards in total joint arthroplasty studies. They found a total of 1154 studies by searching for "cox" AND "hazard" in the abstract. The abstract also had to meet the following criteria: the topic must be on 
+knee or hip joint arthroplasty, survival analysis was used, and a hazard ratio was reported. If those criteria were met, the entire article was read. Nearly 80% of the published TJA survival studies reported proportional hazard assumptions of the Cox regression model 
+inadequately. Also, more than one-fifth of the studies were found to include a probable non-proportional Cox model.
+
+Article 2:
+https://www.sciencedirect.com/science/article/pii/S0001457509002619
+
+Summary: This article uses a cox proprtional hazards model to study the relationship between sleepiness and prediction of a driver's impairment. The approach was to only use the parametric part of the hazard function to study changes in risk of a critical event
+(lane change) due to changes in the explanatory variables (indicators). The probability of a critical event is proportional to the hazard function and therefore the changes in risk can be estimated by changes in the hazard function. All co-variates were statistically signifcant.
