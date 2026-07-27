@@ -1,87 +1,273 @@
 ---
-title: "Report Sample"
-author: "Student name"
+title: "Cox Proportional Hazards Model"
+author: "Halley Deleeuw and Jasmine Sawh"
 date: '`r Sys.Date()`'
 format:
   html:
     code-fold: true
+    toc: true
+    toc-depth: 2
+    number-sections: true
 course: STA 6257 - Advanced Statistical Modeling
-bibliography: references.bib # file contains bibtex for references
-#always_allow_html: true # this allows to get PDF with HTML features
+bibliography: references.bib
 self-contained: true
-execute: 
+execute:
   warning: false
   message: false
-editor: 
-  markdown: 
+editor:
+  markdown:
     wrap: 72
 ---
 
 ## Introduction
 
-This is an introduction to Kernel regression, which is a non-parametric
-estimator that estimates the conditional expectation of two variables
-which is random. The goal of a kernel regression is to discover the
-non-linear relationship between two random variables. To discover the
-non-linear relationship, kernel estimator or kernel smoothing is the
-main method to estimate the curve for non-parametric statistics. In
-kernel estimator, weight function is known as kernel function
-[@efr2008]. Cite this paper [@bro2014principal]. The GEE [@wang2014].
+The Cox Proportional Hazards (Cox PH) model is a statistical method used
+for survival analysis. It is a semi-parametric estimator that focuses on
+the *hazard function*, which represents the instantaneous risk of an
+event occurring at a given time, given that the subject has survived up
+to that time [@cox1972]. It is widely used in fields such as medicine and
+epidemiology, where the outcome of interest is the time until an event
+such as death, relapse, or re-infection.
+
+The purpose of the Cox PH model is to describe the relationship between
+one or more explanatory variables (covariates) and the hazard, while
+allowing for censored observations — subjects for whom the event has not
+occurred by the end of the study. The response in a survival model has
+two parts: an event indicator (did the event happen?) and a measure of
+time (how long until the event or until the subject was last observed)
+[@kaplan1958].
+
+In this report we apply the Cox PH model to the North Central Cancer
+Treatment Group (NCCTG) lung cancer data set [@loprinzi1994], which
+records survival times of patients with advanced lung cancer along with
+several clinical measurements. Our goal is to identify which patient
+characteristics are associated with the risk of death, to estimate the
+size of those effects as hazard ratios, and to check whether the
+model's proportional-hazards assumption is reasonable for these data.
 
 ## Methods
 
-The common non-parametric regression model is
-$Y_i = m(X_i) + \varepsilon_i$, where $Y_i$ can be defined as the sum of
-the regression function value $m(x)$ for $X_i$. Here $m(x)$ is unknown
-and $\varepsilon_i$ some errors. With the help of this definition, we
-can create the estimation for local averaging i.e. $m(x)$ can be
-estimated with the product of $Y_i$ average and $X_i$ is near to $x$. In
-other words, this means that we are discovering the line through the
-data points with the help of surrounding data points. The estimation
-formula is printed below [@R-base]:
+### The hazard function and the Cox model
+
+Survival analysis models the time $T$ until an event. Two related
+functions describe the distribution of $T$. The *survival function*
+$S(t) = P(T > t)$ gives the probability of surviving beyond time $t$.
+The *hazard function*
 
 $$
-M_n(x) = \sum_{i=1}^{n} W_n (X_i) Y_i  \tag{1}
-$$ $W_n(x)$ is the sum of weights that belongs to all real numbers.
-Weights are positive numbers and small if $X_i$ is far from $x$.
+h(t) = \lim_{\Delta t \to 0} \frac{P(t \le T < t + \Delta t \mid T \ge t)}{\Delta t}
+$$
+
+gives the instantaneous rate of the event at time $t$ for subjects still
+at risk. The Cox model [@cox1972] specifies the hazard for a subject with
+covariate vector $\mathbf{x} = (x_1, \dots, x_p)$ as
+
+$$
+h(t \mid \mathbf{x}) = h_0(t)\,\exp\!\left(\beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p\right).
+\tag{1}
+$$
+
+Here $h_0(t)$ is the *baseline hazard* — an unspecified function of time
+shared by all subjects — and the exponential term scales that baseline up
+or down according to the covariates. Because $h_0(t)$ is left
+unspecified, the model is called *semi-parametric*: it makes no
+assumption about the shape of the baseline hazard over time, only about
+how covariates shift it.
+
+### Hazard ratios
+
+The coefficients are estimated by maximizing Cox's *partial likelihood*,
+which depends only on the order in which events occur and therefore does
+not require estimating $h_0(t)$ [@cox1972]. The quantity of interest is
+the *hazard ratio* (HR), $\exp(\beta_j)$, which compares the hazard for a
+one-unit increase in covariate $x_j$, holding the other covariates fixed:
+
+- $\exp(\beta_j) > 1$: higher values of $x_j$ **increase** the hazard
+  (worse survival);
+- $\exp(\beta_j) < 1$: higher values of $x_j$ **decrease** the hazard
+  (better survival);
+- $\exp(\beta_j) = 1$: $x_j$ has no effect.
+
+### The proportional-hazards assumption
+
+The name of the model comes from its central assumption: the ratio of
+hazards between any two subjects is **constant over time**. Equivalently,
+covariate effects do not change as time passes. If this assumption is
+violated, the estimated hazard ratios can be misleading [@abeysekera2009].
+We assess it using the scaled Schoenfeld residuals [@schoenfeld1982]:
+under proportional hazards these residuals should show no trend against
+time, and the associated test (implemented as `cox.zph` in the
+`survival` package [@survival-package]) should be non-significant.
 
 ## Analysis and Results
 
-### Data and Vizualisation
+### Data and visualization
 
-A study was conducted to determine how...
+The `lung` data set is included in the `survival` package
+[@survival-package]. Each row is a patient; the outcome is time from
+study entry (in days) to death or censoring. The covariates we consider
+are age, sex, and two measures of performance status — the ECOG score
+(`ph.ecog`, higher = more impaired) and the physician-rated Karnofsky
+score (`ph.karno`, higher = better) — along with six-month weight loss
+(`wt.loss`).
 
-```{r, warning=FALSE, echo=T, message=FALSE}
-# loading packages 
-library(tidyverse)
+```{r}
+#| label: setup
+library(survival)
+library(ggplot2)
 library(knitr)
-library(ggthemes)
-library(ggrepel)
-library(dslabs)
+
+theme_set(theme_bw(base_size = 12))
+
+# 'lung' ships with the survival package. status is coded 1 = censored,
+# 2 = dead; recode to the 0/1 event indicator the models expect, and give
+# sex readable labels.
+lung$status_event <- lung$status - 1
+lung$sex_f <- factor(lung$sex, levels = c(1, 2), labels = c("Male", "Female"))
+
+kable(
+  head(lung[, c("time", "status", "age", "sex_f", "ph.ecog", "ph.karno", "wt.loss")]),
+  caption = "First six patients in the NCCTG lung cancer data set."
+)
 ```
 
-```{r, warning=FALSE, echo=TRUE}
-# Load Data
-kable(head(murders))
+The data set contains `r nrow(lung)` patients, of whom
+`r sum(lung$status_event)` died during follow-up (the remainder were
+censored). We begin by estimating the survival function with the
+Kaplan–Meier method [@kaplan1958], overall and separately by sex.
 
-ggplot1 = murders %>% ggplot(mapping = aes(x=population/10^6, y=total)) 
+```{r}
+#| label: km-curve
+#| fig-cap: "Kaplan–Meier survival curves by sex. Females (blue) survive longer than males (red)."
+# Helper: turn a survfit object into a tidy data frame for ggplot.
+tidy_surv <- function(fit) {
+  strata <- if (is.null(fit$strata)) {
+    rep("All", length(fit$time))
+  } else {
+    rep(sub(".*=", "", names(fit$strata)), fit$strata)
+  }
+  # Prepend the (time = 0, surv = 1) origin for each stratum so the step
+  # curves start at 100% survival.
+  origin <- data.frame(time = 0, surv = 1, strata = unique(strata))
+  rbind(origin, data.frame(time = fit$time, surv = fit$surv, strata = strata))
+}
 
-  ggplot1 + geom_point(aes(col=region), size = 4) +
-  geom_text_repel(aes(label=abb)) +
-  scale_x_log10() +
-  scale_y_log10() +
-  geom_smooth(formula = "y~x", method=lm,se = F)+
-  xlab("Populations in millions (log10 scale)") + 
-  ylab("Total number of murders (log10 scale)") +
-  ggtitle("US Gun Murders in 2010") +
-  scale_color_discrete(name = "Region")+
-      theme_bw()
-  
+km_sex <- survfit(Surv(time, status_event) ~ sex_f, data = lung)
 
+ggplot(tidy_surv(km_sex), aes(time, surv, color = strata)) +
+  geom_step(linewidth = 0.9) +
+  scale_y_continuous(limits = c(0, 1), labels = scales::percent) +
+  scale_color_manual(values = c(Male = "#c0392b", Female = "#2c7fb8")) +
+  labs(x = "Time (days)", y = "Survival probability", color = "Sex",
+       title = "Survival by sex — NCCTG lung cancer")
 ```
 
-### Statistical Modeling
+The curves separate clearly, with female patients maintaining higher
+survival probabilities throughout follow-up. A log-rank test formally
+compares the two groups:
 
-### Conlusion
+```{r}
+#| label: logrank
+survdiff(Surv(time, status_event) ~ sex_f, data = lung)
+```
+
+The log-rank test is highly significant (p ≈ 0.001), confirming that the
+difference in survival between males and females is unlikely to be due to
+chance. This matches findings in the clinical literature that female lung
+cancer patients tend to have better survival than males.
+
+### Statistical modeling
+
+We now fit a Cox proportional hazards model with age, sex, ECOG
+performance status, Karnofsky score, and weight loss as covariates.
+
+```{r}
+#| label: cox-fit
+cox_model <- coxph(
+  Surv(time, status_event) ~ age + sex_f + ph.ecog + ph.karno + wt.loss,
+  data = lung
+)
+
+# Present the estimates as hazard ratios with 95% confidence intervals.
+s  <- summary(cox_model)
+ci <- s$conf.int
+hr_table <- data.frame(
+  Term            = rownames(ci),
+  `Hazard Ratio`  = round(ci[, "exp(coef)"], 3),
+  `Lower 95%`     = round(ci[, "lower .95"], 3),
+  `Upper 95%`     = round(ci[, "upper .95"], 3),
+  `p-value`       = signif(s$coefficients[, "Pr(>|z|)"], 3),
+  check.names = FALSE
+)
+kable(hr_table, row.names = FALSE,
+      caption = "Estimated hazard ratios from the Cox model.")
+```
+
+The model as a whole is highly significant (likelihood-ratio test
+p ≈ 3 × 10⁻⁶), with a concordance of
+`r round(s$concordance[["C"]], 2)`, meaning the model correctly orders
+the survival of two randomly chosen patients about
+`r round(100 * s$concordance[["C"]])`% of the time. Interpreting the
+individual hazard ratios:
+
+- **Sex.** Female patients have a hazard ratio of about
+  `r round(ci["sex_fFemale", "exp(coef)"], 2)`, i.e. roughly a
+  `r round(100 * (1 - ci["sex_fFemale", "exp(coef)"]))`% lower risk of
+  death than males with the same age and performance status
+  (p < 0.001). This is the strongest protective effect in the model.
+- **ECOG performance status.** Each one-point increase in `ph.ecog`
+  (worse functional status) is associated with a hazard ratio of about
+  `r round(ci["ph.ecog", "exp(coef)"], 2)` — more than doubling the risk
+  of death (p < 0.001).
+- **Age, Karnofsky score, and weight loss.** These covariates are not
+  statistically significant at the 0.05 level once sex and ECOG status
+  are accounted for, though the point estimates are in the expected
+  directions.
+
+### Checking the proportional-hazards assumption
+
+Finally we test whether the proportional-hazards assumption holds, using
+the scaled Schoenfeld residuals [@schoenfeld1982].
+
+```{r}
+#| label: ph-test
+ph_test <- cox.zph(cox_model)
+ph_test
+```
+
+```{r}
+#| label: ph-plot
+#| fig-cap: "Scaled Schoenfeld residuals for ECOG performance status against time. A roughly flat trend supports the proportional-hazards assumption."
+plot(ph_test[3], main = "Schoenfeld residuals: ECOG performance status")
+abline(h = 0, col = "red", lty = 2)
+```
+
+The **global** test is not significant (p ≈ 0.21), so overall the
+proportional-hazards assumption is reasonable for this model. The only
+covariate showing a possible violation is the Karnofsky score
+(p ≈ 0.03); in practice this could be addressed by stratifying on
+Karnofsky score or by adding a time-varying effect, but the global fit is
+acceptable for our purposes.
+
+## Conclusion
+
+Using the NCCTG lung cancer data, the Cox proportional hazards model
+identified two strong and statistically significant predictors of
+survival: **sex** and **ECOG performance status**. Female patients had
+roughly half the hazard of death of male patients, and each step of
+worsening ECOG status more than doubled the hazard. Age, Karnofsky
+score, and recent weight loss were not significant once these two
+factors were included. Diagnostic testing with scaled Schoenfeld
+residuals indicated that the proportional-hazards assumption held
+globally, giving us confidence in the estimated hazard ratios.
+
+These results illustrate the strengths of the Cox model that drew us to
+it during our literature review: it handles censored survival data,
+produces interpretable hazard ratios without assuming a particular shape
+for the baseline hazard, and comes with well-established tools for
+checking its central assumption. A natural extension, noted in our
+reading on frailty models, would be to account for unobserved
+heterogeneity between patients — but for these data the standard Cox
+model already provides a clear and well-fitting description of survival.
 
 ## References

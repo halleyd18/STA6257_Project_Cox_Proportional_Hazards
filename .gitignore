@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Quarto / knitr render artifacts
+.quarto/
+index_files/
+/*_cache/
+.DS_Store
